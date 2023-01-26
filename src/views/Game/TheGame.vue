@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.TheGame">
-<!--    <GameEnd v-if="gameEnd" />-->
+    <GameEnd v-if="gameEnd" />
     <!--TODO: переделать на store    -->
     <canvas
       ref="field"
@@ -16,13 +16,13 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted } from 'vue'
-// import GameEnd from '@/views/Game/components/GameEnd.vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import GameEnd from '@/views/Game/components/GameEnd.vue'
 
 export default {
   name: 'TheGame',
 
-  // components: { GameEnd },
+  components: { GameEnd },
 
   setup () {
     // FIELD
@@ -31,8 +31,11 @@ export default {
 
     // SNAKE
     const snake = reactive({ x: 100, y: 80 })
-    const direction = ref('up')
+    const direction = ref('right')
     const snakeSize = ref(20)
+    const snakeCoordinates = ref([])
+    const snakeLength = ref(2)
+    const isSnakeMoving = ref()
 
     const moveSnake = () => {
       switch (direction.value) {
@@ -53,17 +56,43 @@ export default {
           snake.x -= snakeSize.value
           break
       }
-      draw()
+      drawSnake()
     }
+
+    // watch(snakeCoordinates, (coordinates) => {
+    //   console.log('snakeCoordinates: ', coordinates)
+    //   if (coordinates.length > snakeLength.value) {
+    //     coordinates.shift()
+    //   }
+    // })
+
+    watch(() => [...snakeCoordinates.value], (coordinates) => {
+      if (coordinates.length > snakeLength.value) {
+        drawField(coordinates[0])
+        coordinates.shift()
+      }
+    })
 
     // GAME
     const gameEnd = computed(() => snake.x < 0 || snake.x > fieldSize.width || snake.y < 0 || snake.y > fieldSize.height)
 
-    const draw = () => {
+    const drawSnake = () => {
       const ctx = field.value.getContext('2d')
       ctx.fillStyle = 'red'
       ctx.fillRect(snake.x, snake.y, snakeSize.value, snakeSize.value)
+      snakeCoordinates.value.push({ x: snake.x, y: snake.y })
     }
+
+    const drawField = () => {
+      const ctx = field.value.getContext('2d')
+      ctx.fillStyle = document.documentElement.style.getPropertyValue('$Filling')
+      console.log()
+      ctx.fillRect(snake.x, snake.y, snakeSize.value, snakeSize.value)
+    }
+
+    watch(gameEnd, (value) => {
+      if (value) clearInterval(isSnakeMoving.value)
+    })
 
     const changeDirection = (newDirection) => {
       console.log(newDirection)
@@ -71,21 +100,25 @@ export default {
     }
 
     onMounted(() => {
-      draw()
-      setInterval(moveSnake, 500)
+      drawSnake()
+      isSnakeMoving.value = setInterval(moveSnake, 500)
     })
 
     return {
       field,
       fieldSize,
       gameEnd,
+      direction,
+      snakeSize,
+      snakeCoordinates,
+      snakeLength,
       changeDirection,
-      draw
+      drawSnake
     }
   }
 
   // mounted () {
-  //   this.draw()
+  //   this.drawSnake()
   //
   //   setInterval(() => {
   //
