@@ -1,5 +1,7 @@
 <template>
-  <div :class="$style.TheGame">
+  <div
+    :class="$style.TheGame"
+  >
     <GameEnd v-if="gameEnd" />
     <!--TODO: переделать на store    -->
     <canvas
@@ -7,11 +9,14 @@
       :width="fieldSize.width"
       :height="fieldSize.height"
       :class="$style.field"
-      @keydown.up.prevent="changeDirection('up')"
-      @keydown.down.prevent="changeDirection('down')"
+      @keyup.down.exact="changeDirection('down')"
       @keydown.right="changeDirection('right')"
       @keydown.left="changeDirection('left')"
     ></canvas>
+
+<!--    @keydown.down="changeDirection('down')"-->
+<!--    @keydown.right="changeDirection('right')"-->
+<!--    @keydown.left="changeDirection('left')"-->
   </div>
 </template>
 
@@ -59,19 +64,14 @@ export default {
       drawSnake()
     }
 
-    // watch(snakeCoordinates, (coordinates) => {
-    //   console.log('snakeCoordinates: ', coordinates)
-    //   if (coordinates.length > snakeLength.value) {
-    //     coordinates.shift()
-    //   }
-    // })
-
-    watch(() => [...snakeCoordinates.value], (coordinates) => {
-      if (coordinates.length > snakeLength.value) {
-        drawField(coordinates[0])
-        coordinates.shift()
+    watch(() => [...snakeCoordinates.value],
+      (coordinates) => {
+        if (coordinates.length > snakeLength.value) {
+          drawField(coordinates[0])
+          snakeCoordinates.value.shift()
+        }
       }
-    })
+    )
 
     // GAME
     const gameEnd = computed(() => snake.x < 0 || snake.x > fieldSize.width || snake.y < 0 || snake.y > fieldSize.height)
@@ -83,11 +83,10 @@ export default {
       snakeCoordinates.value.push({ x: snake.x, y: snake.y })
     }
 
-    const drawField = () => {
+    const drawField = ({ x, y }) => {
       const ctx = field.value.getContext('2d')
-      ctx.fillStyle = document.documentElement.style.getPropertyValue('$Filling')
-      console.log()
-      ctx.fillRect(snake.x, snake.y, snakeSize.value, snakeSize.value)
+      ctx.fillStyle = '#94bd91'
+      ctx.fillRect(x, y, snakeSize.value, snakeSize.value)
     }
 
     watch(gameEnd, (value) => {
@@ -100,6 +99,23 @@ export default {
     }
 
     onMounted(() => {
+      const canvas = field.value
+      canvas.addEventListener('keydown', (e) => {
+        switch (e.keyCode) {
+          case 37:
+            this.direction = 'left'
+            break
+          case 38:
+            this.direction = 'up'
+            break
+          case 39:
+            this.direction = 'right'
+            break
+          case 40:
+            this.direction = 'down'
+            break
+        }
+      })
       drawSnake()
       isSnakeMoving.value = setInterval(moveSnake, 500)
     })

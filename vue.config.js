@@ -2,7 +2,7 @@ module.exports = {
   transpileDependencies: true,
   css: {
     loaderOptions: {
-      sass: {
+      scss: {
         additionalData: '@import "@/styles/main.scss";'
       }
     }
