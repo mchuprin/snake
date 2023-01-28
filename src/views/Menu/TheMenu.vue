@@ -3,8 +3,8 @@
     <div :class="$style.title">
       <h1>Snake</h1>
       <h2>JS Edition</h2>
-      <router-link to="/game" :class="$style.setting">НАЧАТЬ</router-link>
-      <router-link to="/settings" :class="$style.setting">НАСТРОЙКИ</router-link>
+      <router-link to="/game" class="button">НАЧАТЬ</router-link>
+      <router-link to="/settings" class="button">НАСТРОЙКИ</router-link>
     </div>
   </div>
 </template>
@@ -26,24 +26,9 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
 
-.setting {
-  border: dashed $Border 2px;
-  background: $Filling;
-  padding: 15px 30px 10px;
-  text-decoration: none;
-  color: $Text;
-  border-radius: 20px;
-  font-size: 17px;
-  transition: .5s;
-
-  &:not(:last-child) {
-    margin-bottom: 10px;
-  }
-
-  &:hover {
-    transform: scale(1.1);
+  & > :not(:last-child) {
+    margin-bottom: 8px;
   }
 }
 

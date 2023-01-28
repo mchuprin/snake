@@ -16,3 +16,18 @@ h2 {
     color: $Subtitle;
     font-size: 35px;
 }
+
+.button {
+    border: dashed $Border 2px;
+    background: $Filling;
+    padding: 15px 30px 10px;
+    text-decoration: none;
+    color: $Text;
+    border-radius: 20px;
+    font-size: 17px;
+    transition: .5s;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
